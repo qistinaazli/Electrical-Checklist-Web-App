@@ -1,0 +1,19 @@
+﻿@page "/db-test"
+@inject IDbHelper dbhelper
+
+@foreach (var data in dataFetches)
+{
+	<li>@data.model_num</li>
+}
+
+@code {
+	private List<DataFetch> dataFetches = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		string cmd = $"SELECT model_num FROM checklist_responses WHERE name = 'Nur Qistina';";
+
+		dataFetches = await dbhelper.Fetch<DataFetch>(cmd);
+	}
+
+}

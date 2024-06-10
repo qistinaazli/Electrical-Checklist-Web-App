@@ -1,0 +1,177 @@
+﻿@page "/signup"
+@using System.Security.Cryptography
+@using System.Text
+@using FirstWebApp.Service
+
+@inject IDbHelper DbHelper
+@inject ISnackbar snack
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .signup-container {
+        width: 400px;
+        padding: 20px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 60px auto; /* Centering the container */
+    }
+
+    h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .input-field {
+        width: calc(100% - 22px); /* Subtracting padding and border */
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        text-align: center;
+    }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+    .validation-error {
+        color: #dc3545;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="signup-container">
+    <h3>Sign Up</h3>
+
+    <EditForm Model="newUser" OnValidSubmit="HandleSignUp">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label>Name:</label>
+            <InputText @bind-Value="newUser.name" class="input-field" />
+        </div>
+        <div>
+            <label>Email:</label>
+            <InputText @bind-Value="newUser.email" class="input-field" />
+        </div>
+        <div>
+            <label>Password:</label>
+            <InputText @bind-Value="newUser.password" type="password" class="input-field" />
+        </div>
+        <div>
+            <label>User Type:</label>
+            <InputSelect @bind-Value="newUser.user_type" class="input-field">
+                <option value="0">Admin</option>
+                <option value="1">Staff</option>
+                <option value="2">Super Admin</option>
+            </InputSelect>
+        </div>
+
+        <button type="submit">Sign Up</button>
+    </EditForm>
+</div>
+
+@code {
+    private User newUser = new User();
+
+    private async Task HandleSignUp()
+    {
+        if (IsValidPassword(newUser.password))
+        {
+            // Generate salt
+            string salt = GenerateSalt();
+            newUser.salt = salt;
+
+            // Hash the password with salt
+            newUser.password = HashPassword(newUser.password, salt);
+
+            try {
+                string sql = "INSERT INTO users (name, email, password, salt, user_type, date_created) VALUES (@name, @email, @password, @salt, @user_type, @date_created)";
+                await DbHelper.ExecuteRawSqlAsync(sql, new
+                {
+                    newUser.name,
+                    newUser.email,
+                    newUser.password,
+                    newUser.salt,
+                    newUser.user_type,
+                    date_created = DateTime.UtcNow // Assuming date_created is a timestamp
+                });
+
+                snack.Add("You have successfully registered your account.", Severity.Success);
+            } catch (Exception ex) {
+                snack.Add($"Error registering user: {ex.Message}", Severity.Error);
+            }
+        }
+        else
+        {
+            snack.Add("Unable to Sign Up", Severity.Error);
+        }
+    }
+
+    private bool IsValidPassword(string password)
+    {
+        if (password.Length < 6)
+            return false;
+
+        if (!password.Any(char.IsUpper))
+            return false;
+
+        if (!password.Any(char.IsDigit))
+            return false;
+
+        if (!password.Any(ch => !char.IsLetterOrDigit(ch)))
+            return false;
+
+        return true;
+    }
+
+    private string GenerateSalt()
+    {
+        var buffer = new byte[16];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(buffer);
+        }
+        return Convert.ToBase64String(buffer);
+    }
+
+    private string HashPassword(string password, string salt)
+    {
+        using (var sha256 = SHA256.Create())
+        {
+            var saltedPassword = $"{salt}:{password}";
+            var saltedPasswordBytes = Encoding.UTF8.GetBytes(saltedPassword);
+            var hashBytes = sha256.ComputeHash(saltedPasswordBytes);
+            return Convert.ToBase64String(hashBytes);
+        }
+    }
+}

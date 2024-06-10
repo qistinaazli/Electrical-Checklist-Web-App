@@ -1,0 +1,619 @@
+﻿@page "/"
+@inject IDbHelper dbhelper
+@inject IToastService toastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISessionStorageService SessionStorage
+@inject NavigationManager nav
+@inject ISnackbar snack
+
+@using System.ComponentModel.DataAnnotations
+@using Blazored.Toast.Services
+@using MudBlazor
+@using Microsoft.AspNetCore.Components.Authorization
+@using Blazored.SessionStorage
+
+<br>
+<br>
+
+<AuthorizeView>
+    <Authorized>
+        <label class="centered-label" for="projectName">Project Name: Washing Cleaning Sink</label>
+        <br><br>
+		<div class="container">
+			<MudForm Model="@checklistModel" @ref="form">
+
+				<label for="modelNumber">Model Number</label>
+				<MudTextField @bind-Value="@checklistModel.model_num" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+                <label for="serialNumber">Machine Serial Number</label>
+                <MudTextField @bind-Value="@checklistModel.machine_serial_num" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+				<label for="serialNumber">Motor Serial Number</label>
+				<MudTextField @bind-Value="@checklistModel.motor_serial_num" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+                <label for="serialNumber">Pump Serial Number</label>
+                <MudTextField @bind-Value="@checklistModel.pump_serial_num" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+				<label for="name">Name</label>
+				<MudTextField @bind-Value="@checklistModel.name" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+				<label for="phoneNumber">Phone Number</label>
+				<MudTextField @bind-Value="@checklistModel.phone_number" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+				<label for="email">Email</label>
+				<MudTextField @bind-Value="@checklistModel.email" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+				<label for="verified">Verified By</label>
+				<MudTextField @bind-Value="@checklistModel.verified" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+
+				<!-- Part A -->
+				<h3>
+					Checklist Viewing
+					A) Device/Component/Switch (Before power on)
+				</h3>
+				@foreach (var item in ChecklistItemsA)
+				{
+					<div class="control">
+						<p>@item.Text</p>
+						<MudRadioGroup T="string" @bind-Value="item.SelectedOption">
+							@foreach (var option in item.Options)
+							{
+								<MudRadio T="string" Value="@option" Color="Color.Primary">@option</MudRadio>
+							}
+						</MudRadioGroup>
+					</div>
+				}
+				<br>
+				<!-- Part B -->
+				<h3>B) Lines/cable/wiring (Before power on)</h3>
+				@foreach (var item in ChecklistItemsB)
+				{
+					<div class="control">
+						<p>@item.Text</p>
+						<MudRadioGroup T="string" @bind-Value="item.SelectedOption">
+							@foreach (var option in item.Options)
+							{
+								<MudRadio T="string" Value="@option" Color="Color.Primary">@option</MudRadio>
+							}
+						</MudRadioGroup>
+					</div>
+				}
+				<br>
+				<!-- Part C -->
+				<h3>C) Protective measure fault protection (protection against indirect contact) / (Before power on)</h3>
+				@foreach (var item in ChecklistItemsC)
+				{
+					<div class="control">
+						<p>@item.Text</p>
+						<MudRadioGroup T="string" @bind-Value="item.SelectedOption">
+							@foreach (var option in item.Options)
+							{
+								<MudRadio T="string" Value="@option" Color="Color.Primary">@option</MudRadio>
+							}
+						</MudRadioGroup>
+					</div>
+				}
+				<br>
+				<!-- Part D -->
+				<h3>D) Circuit / Documenting (Before power on)</h3>
+				@foreach (var item in ChecklistItemsD)
+				{
+					<div class="control">
+						<p>@item.Text</p>
+						<MudRadioGroup T="string" @bind-Value="item.SelectedOption">
+							@foreach (var option in item.Options)
+							{
+								<MudRadio T="string" Value="@option" Color="Color.Primary">@option</MudRadio>
+							}
+						</MudRadioGroup>
+					</div>
+				}
+
+				<br>
+				<!-- Part E -->
+				<h3>CHECKLIST "TESTING" (Before power on)</h3>
+				@foreach (var item in ChecklistItemsE)
+				{
+					<div class="control">
+						<p>@item.Text</p>
+						<MudRadioGroup T="string" @bind-Value="item.SelectedOption">
+							@foreach (var option in item.Options)
+							{
+								<MudRadio T="string" Value="@option" Color="Color.Primary">@option</MudRadio>
+							}
+						</MudRadioGroup>
+					</div>
+				}
+				<br>
+				<!-- Part F -->
+				<h3>CHECKLIST "MEASURING" (After connect the power)</h3>
+				@foreach (var item in ChecklistItemsF)
+				{
+					<div class="control">
+						<p>@item.Text</p>
+						<MudRadioGroup T="string" @bind-Value="item.SelectedOption">
+							@foreach (var option in item.Options)
+							{
+								<MudRadio T="string" Value="@option" Color="Color.Primary">@option</MudRadio>
+							}
+						</MudRadioGroup>
+                        <div style="display: flex;align-items: center;">
+                            <input type="text" @bind="item.MultimeterReading" placeholder="Multimeter Reading" style="width: 200px;" />
+                            <span style="margin-left: 5px;">volts</span>
+                        </div>
+                    </div>
+				}
+
+				<br>
+				<div style="text-align: center;">
+					<MudButton OnClick="OnButtonClicked" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" Style="width: 200px; height: 50px;">Submit</MudButton>
+				</div>
+
+			</MudForm>
+
+		</div>
+    </Authorized>
+
+    <NotAuthorized>
+        <MudStack Class="background-image">
+            <MudStack Row="true" Justify="Justify.Center">
+            </MudStack>
+        </MudStack>
+        <br><br>
+        <MudText Color="Color.Primary" Typo="Typo.h2" Align="Align.Center" Class="signin-text">
+            <span>Please</span>
+            <a href="/signin" style="text-decoration: none;">
+                <span style="font-weight: bold;">Sign In</span>
+            </a>
+            <span style="font-size: smaller;">...</span>
+        </MudText>
+
+
+    </NotAuthorized>
+</AuthorizeView>
+
+<style>
+
+    .centered-label {
+        display: block;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .signin-text {
+        font-size: 2rem;
+    }
+
+        .signin-text span {
+            font-family: Arial, sans-serif;
+        }   
+
+            .signin-text span:last-child {
+                font-size: smaller;
+                opacity: 0.6;
+                margin-left: 5px;
+            }
+
+        .signin-text a {
+            color: #007bff;
+            text-decoration: none; 
+        }
+
+    .background-image {
+        background-image: url('10808.jpg');
+        background-size: cover;
+        background-position: center;
+        width: 100%; 
+        height: 0;
+        padding-top: 60vh; 
+        position: relative;
+        max-height: 100vh; 
+    }
+
+
+    form {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    .control {
+        margin-bottom: 20px;
+    }
+
+
+    h3 {
+        color: #000000;
+        text-align: center;
+        margin-top: 30px;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #D5D8DC;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        font-size: 18px;
+    }
+
+    .checklist-item {
+        margin-bottom: 10px;
+    }
+
+        .checklist-item p {
+            margin-bottom: 5px;
+        }
+
+</style>
+
+@code {
+    private MudForm form;
+
+    private ElectricalChecklistModel checklistModel = new ElectricalChecklistModel();
+
+    private List<ChecklistItem> ChecklistItemsA = new List<ChecklistItem>
+    {
+            new ChecklistItem
+            {
+                Id = "ac_terminal_block",
+                Text = "1. AC terminal block must be in correct selection and all the wiring is correct",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "mcb_correct",
+                Text = "2. MCB 01, 2, 3 is correct (2 Pole 6A, 3 pole 16A)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "power_isolator_switch",
+                Text = "3. Power isolator switch wiring are correct based on drawing",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id ="elcb_spec",
+                Text = "4. ELCB follow the drawing spec (40A, 100mA)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "stepdown_transformer",
+                Text = "5. Stepdown transformer already in accurate rate (400v : in ; 220v-240v : out)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "dc_power_supply",
+                Text = "6. DC power supply are in correct selection LR-50-24",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "thermal_motor_spec",
+                Text = "7. Thermal overload relay had been set follow the motor spec",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "thermal_correct",
+                Text = "8. Thermal overload relay did not misalignment and no broken drive",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "emergency_stop_button",
+                Text = "9. Emergency stop button are released",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "motor_pump_wiring",
+                Text = "10. Motor pump are in correct wiring by following UVW",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "indicator_lamp",
+                Text = "11. Indicator lamp in good colour coding etc: no/off function",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "float_sensor",
+                Text = "12. Float sensor in good condition",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "push_button",
+                Text = "13. Push button function well no damage",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "components_correct",
+                Text = "14. All component listed are applied at the right place by following electrical drawing",
+                Options = new List<string> { "Yes", "No" }
+            }  
+        };
+
+    private List<ChecklistItem> ChecklistItemsB = new List<ChecklistItem>
+    {
+            new ChecklistItem
+            {
+                Id = "cable_correct",
+                Text = "15. Cable that being used are correct core / Awg",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "wiring_correct",
+                Text = "16. Wiring such as E-green, L1 red, L2 yellow, L3 blue are connect properly",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "wire_sleeves",
+                Text = "17. Wire sleeves did not break",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "wire_damage",
+                Text = "18. No dented or damage wire are connected",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "strain_relief",
+                Text = "19. Lines, cable are strain relieved to prevent breaking the cable",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "wiring_following_drawing",
+                Text = "20. All wiring / lines are following electrical drawing",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "wire_color_code",
+                Text = "21. No wire colour code swapping inside component",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "no_direct_contact",
+                Text = "22. No direct contact between component and cable",
+                Options = new List<string> { "Yes", "No" }
+            }
+        };
+
+    private List<ChecklistItem> ChecklistItemsC = new List<ChecklistItem>
+    {
+            new ChecklistItem
+            {
+                Id = "correct_wiring",
+                Text = "23. Correct wiring applied and no loose connection",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "indicator_component",
+                Text = "24. Indicator and component work properly",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "emo_function",
+                Text = "25. EMO functioning well and can trigger on / off",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "pump_wiring",
+                Text = "26. Pump electrical wiring installed perfectly",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "no_active_conductor",
+                Text = "27. No connection with active conductor",
+                Options = new List<string> { "Yes", "No" }
+            }
+        };
+
+    private List<ChecklistItem> ChecklistItemsD = new List<ChecklistItem>
+    {
+            new ChecklistItem
+            {
+                Id = "circuit_correct",
+                Text = "28. Circuit is following electrical / schematic drawing",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "documentation_complete",
+                Text = "29. Documentation done and everything complete",
+                Options = new List<string> { "Yes", "No" }
+            }
+        };
+
+    private List<ChecklistItem> ChecklistItemsE = new List<ChecklistItem>
+    {
+            new ChecklistItem
+            {
+                Id = "connection_from_terminal",
+                Text = "30. Check all connection from incoming AC terminal Block to incoming isolator Switch",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "isolator_to_elcb",
+                Text = "31. Connection from isolator switch to incoming ELCB (40A , 0.1mA)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "outelcb_to_mcb",
+                Text = "32. Connectivity from outgoing ELCB (40A , 0.1mA) to incoming MCB (01 , 2P , 6A)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "connection_mcb_transformer",
+                Text = "33. Connection from outgoing MCB (01 , 2P , 6A) to incoming transformer (400v in : 220V out)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "connection_transformer_mcb",
+                Text = "34. Connection from outgoing transformer to incoming MCB (03 , 2P 6A)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "mcb_to_dc_power",
+                Text = "35. Check all connection from outgoing MCB (03 , 2P 6A) to Incoming Dc Power Supply",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "elcb_to_inmcb",
+                Text = "36. Connection from outgoing ELCB 40A , 0.1mA to Incoming MCB (02 , 3P 16A)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "mcb_to_contactor",
+                Text = "37. Connectivity from outgoing MCB (02 , 3P 16A) to Ip Mechanical contactor (MC)",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "mc_to_tor",
+                Text = "38. Continuity from outgoing MC to incoming TOR",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "tor_to_motor",
+                Text = "39. Connection between outgoing TOR to motor pump",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "grounding_terminal",
+                Text = "40. Check functionality for every grounding terminal block",
+                Options = new List<string> { "Yes", "No" }
+            },
+            new ChecklistItem
+            {
+                Id = "level_sensor",
+                Text = "41. The functionality of the level sensor function",
+                Options = new List<string> { "Yes", "No" }
+            }
+        };
+
+    private List<ChecklistItem> ChecklistItemsF = new List<ChecklistItem>
+    {
+            new ChecklistItem
+            {
+                Id = "voltage_phase1_neutral",
+                Text = "42. Check voltage from phase 1 to Neutral (rated volatge 240)",
+                Options = new List<string> { "Yes", "No" },
+                MultimeterReading = "",
+                MultimeterReadingId = "multi_read_phase1"
+            },
+            new ChecklistItem
+            {
+                Id = "voltage_phase2_neutral",
+                Text = "43. Check voltage from phase 2 to Neutral (rated voltage 240)",
+                Options = new List<string> { "Yes", "No" },
+                MultimeterReading = "",
+                MultimeterReadingId = "multi_read_phase2"
+            },
+            new ChecklistItem
+            {
+                Id = "voltage_phase3_neutral",
+                Text = "44. Check voltage from phase 3 to Neutral (rated voltage 240)",
+                Options = new List<string> { "Yes", "No" },
+                MultimeterReading = "",
+                MultimeterReadingId = "multi_read_phase3"
+            }
+    };
+
+
+    private async Task OnButtonClicked()
+    {
+        var token = await SessionStorage.GetItemAsync<string>("token");
+        if (form.IsValid && !string.IsNullOrEmpty(token))
+        {
+
+            try
+            {
+                // Convert string "Yes"/"No" to Boolean
+                var checklistData = new
+                {
+                    checklistModel,
+                    ChecklistItemsA = ChecklistItemsA.Select(item => new { item.Id, item.SelectedOptionAsBoolean }).ToList(),
+                    ChecklistItemsB = ChecklistItemsB.Select(item => new { item.Id, item.SelectedOptionAsBoolean }).ToList(),
+                    ChecklistItemsC = ChecklistItemsC.Select(item => new { item.Id, item.SelectedOptionAsBoolean }).ToList(),
+                    ChecklistItemsD = ChecklistItemsD.Select(item => new { item.Id, item.SelectedOptionAsBoolean }).ToList(),
+                    ChecklistItemsE = ChecklistItemsE.Select(item => new { item.Id, item.SelectedOptionAsBoolean }).ToList(),
+                    ChecklistItemsF = ChecklistItemsF.Select(item => new { item.Id, item.SelectedOptionAsBoolean }).ToList()
+                };
+
+                await dbhelper.InsertElectricalChecklistAsync(checklistModel, ChecklistItemsA,ChecklistItemsB,ChecklistItemsC,
+                ChecklistItemsD, ChecklistItemsE,ChecklistItemsF);
+                snack.Add("Data submitted successfully!", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                snack.Add("An error occurred while submitting data.", Severity.Error);
+            }
+        } else
+        {
+            snack.Add("Your session expired!", Severity.Error);
+            nav.NavigateTo("/signin");
+        }
+    }
+
+    private void SignIn()
+    {
+        nav.NavigateTo("/signin");
+    }
+
+    private void SignUp()
+    {
+        nav.NavigateTo("/signup");
+    }
+}

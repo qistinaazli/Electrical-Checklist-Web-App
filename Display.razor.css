@@ -1,0 +1,28 @@
+﻿@media print {
+    .hide-on-print {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    .print-table, .print-table * {
+        visibility: visible;
+    }
+
+    .print-table {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}

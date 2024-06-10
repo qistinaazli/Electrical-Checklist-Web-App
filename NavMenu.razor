@@ -1,0 +1,67 @@
+﻿@using Blazored.SessionStorage
+
+@inject ISessionStorageService SessionStorage
+@inject AuthenticationStateProvider AuthenticationState
+@inject NavigationManager nav
+
+<AuthorizeView Roles="Admin">
+	<MudNavLink Href="/display" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Dashboard">Checklist Display</MudNavLink>
+</AuthorizeView>
+
+<AuthorizeView Roles="SuperAdmin">
+    <MudNavLink Href="/display" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Dashboard">Checklist Display</MudNavLink>
+    <MudNavLink Href="/signup" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.PersonAdd">Sign Up</MudNavLink>
+</AuthorizeView>
+
+<MudNavMenu class="mud-nav-menu">
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Note">Form</MudNavLink>
+        </Authorized>   
+
+        <NotAuthorized>
+            <MudNavLink Href="/signin" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Person">Sign In</MudNavLink>
+            
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <div class="logout-container">
+        <MudButton Class="logout-button" Icon="@Icons.Material.Outlined.ExitToApp" OnClick="logout">Log Out</MudButton>
+    </div>
+</MudNavMenu>
+
+
+
+<style>
+    .mud-nav-menu {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .logout-container {
+        margin-top: auto;
+    }
+
+    .logout-button {
+        background-color: #007bff; 
+        color: white;
+        margin: 8px 0;
+        width: 100%; 
+    }
+
+        .logout-button:hover {
+            background-color: #0056b3; 
+        }
+</style>
+
+@code
+{
+    private async void logout ()
+    {
+        await SessionStorage.RemoveItemAsync("token");
+        await AuthenticationState.GetAuthenticationStateAsync();
+
+        nav.NavigateTo("/signin");
+    }
+}

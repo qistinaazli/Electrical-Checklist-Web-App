@@ -1,0 +1,351 @@
+﻿@page "/display"
+
+@using Append.Blazor.Printing
+@using System.Text
+@using System.Net.Http.Json
+
+@inject IDbHelper dbhelper
+@inject HttpClient httpClient
+@inject IJSRuntime jsRuntime
+
+<AuthorizeView Roles="@("Admin")">
+    <div style="display: flex; align-items: center; padding: 16px;">
+        <MudTextField @bind-Value="searchTerm" Placeholder="Search..." Variant="Variant.Outlined" Style="flex: 1;" />
+        <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="Search" Variant="Variant.Filled" Color="Color.Success" Style="margin-left: 8px;" />
+        <MudIconButton Icon="@Icons.Material.Filled.Download" OnClick="DownloadTable" Variant="Variant.Filled" Color="Color.Primary" Style="margin-left: 8px;" />
+    </div>
+
+    <MudText Typo="Typo.h5" Align="Align.Center">Project Name: Washing Cleaning Sink</MudText>
+    <MudTable Items="dataFetches" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Model Number</MudTh>
+            <MudTh>Machine Serial Number</MudTh>
+            <MudTh>Motor Serial Number</MudTh>
+            <MudTh>Pump Serial Number</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>Phone Number</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Verified by</MudTh>
+            <MudTh>AC Terminal Block</MudTh>
+            <MudTh>MCB Correct</MudTh>
+            <MudTh>Power Isolator Switch</MudTh>
+            <MudTh>ELCB Spec</MudTh>
+            <MudTh>Stepdown Transformer</MudTh>
+            <MudTh>DC Power Supply</MudTh>
+            <MudTh>Thermal Motor Spec</MudTh>
+            <MudTh>Thermal Correct</MudTh>
+            <MudTh>Emergency Stop Button</MudTh>
+            <MudTh>Motor Pump Wiring</MudTh>
+            <MudTh>Indicator Lamp</MudTh>
+            <MudTh>Float Sensor</MudTh>
+            <MudTh>Push Button</MudTh>
+            <MudTh>Components Correct</MudTh>
+            <MudTh>Cable Correct</MudTh>
+            <MudTh>Wiring Correct</MudTh>
+            <MudTh>Wire Sleeves</MudTh>
+            <MudTh>Wire Damage</MudTh>
+            <MudTh>Wiring Following Drawing</MudTh>
+            <MudTh>Wire Color Code</MudTh>
+            <MudTh>No Direct Contact</MudTh>
+            <MudTh>Correct Wiring</MudTh>
+            <MudTh>Indicator Component</MudTh>
+            <MudTh>EMO Function</MudTh>
+            <MudTh>Pump Wiring</MudTh>
+            <MudTh>No Active Conductor</MudTh>
+            <MudTh>Circuit Correct</MudTh>
+            <MudTh>Documentation Complete</MudTh>
+            <MudTh>Connection From Terminal</MudTh>
+            <MudTh>Isolator to ELCB</MudTh>
+            <MudTh>Out ELCB to MCB</MudTh>
+            <MudTh>Connection MCB Transformer</MudTh>
+            <MudTh>Connection Transformer MCB</MudTh>
+            <MudTh>MCB to DC Power</MudTh>
+            <MudTh>ELCB to IN MCB</MudTh>
+            <MudTh>MCB to Contactor</MudTh>
+            <MudTh>MC to TOR</MudTh>
+            <MudTh>TOR to Motor</MudTh>
+            <MudTh>Grounding Terminal</MudTh>
+            <MudTh>Level Sensor</MudTh>
+            <MudTh>Voltage Phase 1 Neutral</MudTh>
+            <MudTh>Multi Read Phase 1 (V)</MudTh>
+            <MudTh>Voltage Phase 2 Neutral</MudTh>
+            <MudTh>Multi Read Phase 2 (V)</MudTh>
+            <MudTh>Voltage Phase 3 Neutral</MudTh>
+            <MudTh>Multi Read Phase 3 (V)</MudTh>
+        </HeaderContent>
+        <RowTemplate Context="rowContext">
+            <MudTd DataLabel="Id">@rowContext.id</MudTd>
+            <MudTd DataLabel="Model Number">@rowContext.model_num</MudTd>
+            <MudTd DataLabel="Serial Number">@rowContext.machine_serial_num</MudTd>
+            <MudTd DataLabel="Serial Number">@rowContext.motor_serial_num</MudTd>
+            <MudTd DataLabel="Serial Number">@rowContext.pump_serial_num</MudTd>
+            <MudTd DataLabel="Name">@rowContext.name</MudTd>
+            <MudTd DataLabel="Phone Number">@rowContext.phone_number</MudTd>
+            <MudTd DataLabel="Email">@rowContext.email</MudTd>
+            <MudTd DataLabel="QC Inspector">@rowContext.verified</MudTd>
+            <MudTd DataLabel="AC Terminal Block">@rowContext.ac_terminal_block</MudTd>
+            <MudTd DataLabel="MCB Correct">@rowContext.mcb_correct</MudTd>
+            <MudTd DataLabel="Power Isolator Switch">@rowContext.power_isolator_switch</MudTd>
+            <MudTd DataLabel="ELCB Spec">@rowContext.elcb_spec</MudTd>
+            <MudTd DataLabel="Stepdown Transformer">@rowContext.stepdown_transformer</MudTd>
+            <MudTd DataLabel="DC Power Supply">@rowContext.dc_power_supply</MudTd>
+            <MudTd DataLabel="Thermal Motor Spec">@rowContext.thermal_motor_spec</MudTd>
+            <MudTd DataLabel="Thermal Correct">@rowContext.thermal_correct</MudTd>
+            <MudTd DataLabel="Emergency Stop Button">@rowContext.emergency_stop_button</MudTd>
+            <MudTd DataLabel="Motor Pump Wiring">@rowContext.motor_pump_wiring</MudTd>
+            <MudTd DataLabel="Indicator Lamp">@rowContext.indicator_lamp</MudTd>
+            <MudTd DataLabel="Float Sensor">@rowContext.float_sensor</MudTd>
+            <MudTd DataLabel="Push Button">@rowContext.push_button</MudTd>
+            <MudTd DataLabel="Components Correct">@rowContext.components_correct</MudTd>
+            <MudTd DataLabel="Cable Correct">@rowContext.cable_correct</MudTd>
+            <MudTd DataLabel="Wiring Correct">@rowContext.wiring_correct</MudTd>
+            <MudTd DataLabel="Wire Sleeves">@rowContext.wire_sleeves</MudTd>
+            <MudTd DataLabel="Wire Damage">@rowContext.wire_damage</MudTd>
+            <MudTd DataLabel="Wiring Following Drawing">@rowContext.wiring_following_drawing</MudTd>
+            <MudTd DataLabel="Wire Color Code">@rowContext.wire_color_code</MudTd>
+            <MudTd DataLabel="No Direct Contact">@rowContext.no_direct_contact</MudTd>
+            <MudTd DataLabel="Correct Wiring">@rowContext.correct_wiring</MudTd>
+            <MudTd DataLabel="Indicator Component">@rowContext.indicator_component</MudTd>
+            <MudTd DataLabel="EMO Function">@rowContext.emo_function</MudTd>
+            <MudTd DataLabel="Pump Wiring">@rowContext.pump_wiring</MudTd>
+            <MudTd DataLabel="No Active Conductor">@rowContext.no_active_conductor</MudTd>
+            <MudTd DataLabel="Circuit Correct">@rowContext.circuit_correct</MudTd>
+            <MudTd DataLabel="Documentation Complete">@rowContext.documentation_complete</MudTd>
+            <MudTd DataLabel="Connection From Terminal">@rowContext.connection_from_terminal</MudTd>
+            <MudTd DataLabel="Isolator to ELCB">@rowContext.isolator_to_elcb</MudTd>
+            <MudTd DataLabel="Out ELCB to MCB">@rowContext.outelcb_to_mcb</MudTd>
+            <MudTd DataLabel="Connection MCB Transformer">@rowContext.connection_mcb_transformer</MudTd>
+            <MudTd DataLabel="Connection Transformer MCB">@rowContext.connection_transformer_mcb</MudTd>
+            <MudTd DataLabel="MCB to DC Power">@rowContext.mcb_to_dc_power</MudTd>
+            <MudTd DataLabel="ELCB to IN MCB">@rowContext.elcb_to_inmcb</MudTd>
+            <MudTd DataLabel="MCB to Contactor">@rowContext.mcb_to_contactor</MudTd>
+            <MudTd DataLabel="MC to TOR">@rowContext.mc_to_tor</MudTd>
+            <MudTd DataLabel="TOR to Motor">@rowContext.tor_to_motor</MudTd>
+            <MudTd DataLabel="Grounding Terminal">@rowContext.grounding_terminal</MudTd>
+            <MudTd DataLabel="Level Sensor">@rowContext.level_sensor</MudTd>
+            <MudTd DataLabel="Voltage Phase 1 Neutral">@rowContext.voltage_phase1_neutral</MudTd>
+            <MudTd DataLabel="Multi Read Phase 1 (V)">@rowContext.multi_read_phase1</MudTd>
+            <MudTd DataLabel="Voltage Phase 2 Neutral">@rowContext.voltage_phase2_neutral</MudTd>
+            <MudTd DataLabel="Multi Read Phase 2 (V)">@rowContext.multi_read_phase2</MudTd>
+            <MudTd DataLabel="Voltage Phase 3 Neutral">@rowContext.voltage_phase3_neutral</MudTd>
+            <MudTd DataLabel="Multi Read Phase 3 (V)">@rowContext.multi_read_phase3</MudTd>
+           
+        </RowTemplate>
+    </MudTable>
+</AuthorizeView>
+
+<AuthorizeView Roles="@("SuperAdmin")">
+    <div style="display: flex; align-items: center; padding: 16px;">
+        <MudTextField @bind-Value="searchTerm" Placeholder="Search..." Variant="Variant.Outlined" Style="flex: 1;" />
+        <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="Search" Variant="Variant.Filled" Color="Color.Success" Style="margin-left: 8px;" />
+        <MudIconButton Icon="@Icons.Material.Filled.Download" OnClick="DownloadTable" Variant="Variant.Filled" Color="Color.Primary" Style="margin-left: 8px;" />
+    </div>
+
+    <MudText Typo="Typo.h5" Align="Align.Center">Project Name: Washing Cleaning Sink</MudText>
+    <MudTable Items="dataFetches" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Model Number</MudTh>
+            <MudTh>Machine Serial Number</MudTh>
+            <MudTh>Motor Serial Number</MudTh>
+            <MudTh>Pump Serial Number</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>Phone Number</MudTh>
+            <MudTh>Email</MudTh>
+            <MudTh>Verified by</MudTh>
+            <MudTh>AC Terminal Block</MudTh>
+            <MudTh>MCB Correct</MudTh>
+            <MudTh>Power Isolator Switch</MudTh>
+            <MudTh>ELCB Spec</MudTh>
+            <MudTh>Stepdown Transformer</MudTh>
+            <MudTh>DC Power Supply</MudTh>
+            <MudTh>Thermal Motor Spec</MudTh>
+            <MudTh>Thermal Correct</MudTh>
+            <MudTh>Emergency Stop Button</MudTh>
+            <MudTh>Motor Pump Wiring</MudTh>
+            <MudTh>Indicator Lamp</MudTh>
+            <MudTh>Float Sensor</MudTh>
+            <MudTh>Push Button</MudTh>
+            <MudTh>Components Correct</MudTh>
+            <MudTh>Cable Correct</MudTh>
+            <MudTh>Wiring Correct</MudTh>
+            <MudTh>Wire Sleeves</MudTh>
+            <MudTh>Wire Damage</MudTh>
+            <MudTh>Wiring Following Drawing</MudTh>
+            <MudTh>Wire Color Code</MudTh>
+            <MudTh>No Direct Contact</MudTh>
+            <MudTh>Correct Wiring</MudTh>
+            <MudTh>Indicator Component</MudTh>
+            <MudTh>EMO Function</MudTh>
+            <MudTh>Pump Wiring</MudTh>
+            <MudTh>No Active Conductor</MudTh>
+            <MudTh>Circuit Correct</MudTh>
+            <MudTh>Documentation Complete</MudTh>
+            <MudTh>Connection From Terminal</MudTh>
+            <MudTh>Isolator to ELCB</MudTh>
+            <MudTh>Out ELCB to MCB</MudTh>
+            <MudTh>Connection MCB Transformer</MudTh>
+            <MudTh>Connection Transformer MCB</MudTh>
+            <MudTh>MCB to DC Power</MudTh>
+            <MudTh>ELCB to IN MCB</MudTh>
+            <MudTh>MCB to Contactor</MudTh>
+            <MudTh>MC to TOR</MudTh>
+            <MudTh>TOR to Motor</MudTh>
+            <MudTh>Grounding Terminal</MudTh>
+            <MudTh>Level Sensor</MudTh>
+            <MudTh>Voltage Phase 1 Neutral</MudTh>
+            <MudTh>Multi Read Phase 1 (V)</MudTh>
+            <MudTh>Voltage Phase 2 Neutral</MudTh>
+            <MudTh>Multi Read Phase 2 (V)</MudTh>
+            <MudTh>Voltage Phase 3 Neutral</MudTh>
+            <MudTh>Multi Read Phase 3 (V)</MudTh>
+        </HeaderContent>
+        <RowTemplate Context="rowContext">
+            <MudTd DataLabel="Id">@rowContext.id</MudTd>
+            <MudTd DataLabel="Model Number">@rowContext.model_num</MudTd>
+            <MudTd DataLabel="Serial Number">@rowContext.machine_serial_num</MudTd>
+            <MudTd DataLabel="Serial Number">@rowContext.motor_serial_num</MudTd>
+            <MudTd DataLabel="Serial Number">@rowContext.pump_serial_num</MudTd>
+            <MudTd DataLabel="Name">@rowContext.name</MudTd>
+            <MudTd DataLabel="Phone Number">@rowContext.phone_number</MudTd>
+            <MudTd DataLabel="Email">@rowContext.email</MudTd>
+            <MudTd DataLabel="QC Inspector">@rowContext.verified</MudTd>
+            <MudTd DataLabel="AC Terminal Block">@rowContext.ac_terminal_block</MudTd>
+            <MudTd DataLabel="MCB Correct">@rowContext.mcb_correct</MudTd>
+            <MudTd DataLabel="Power Isolator Switch">@rowContext.power_isolator_switch</MudTd>
+            <MudTd DataLabel="ELCB Spec">@rowContext.elcb_spec</MudTd>
+            <MudTd DataLabel="Stepdown Transformer">@rowContext.stepdown_transformer</MudTd>
+            <MudTd DataLabel="DC Power Supply">@rowContext.dc_power_supply</MudTd>
+            <MudTd DataLabel="Thermal Motor Spec">@rowContext.thermal_motor_spec</MudTd>
+            <MudTd DataLabel="Thermal Correct">@rowContext.thermal_correct</MudTd>
+            <MudTd DataLabel="Emergency Stop Button">@rowContext.emergency_stop_button</MudTd>
+            <MudTd DataLabel="Motor Pump Wiring">@rowContext.motor_pump_wiring</MudTd>
+            <MudTd DataLabel="Indicator Lamp">@rowContext.indicator_lamp</MudTd>
+            <MudTd DataLabel="Float Sensor">@rowContext.float_sensor</MudTd>
+            <MudTd DataLabel="Push Button">@rowContext.push_button</MudTd>
+            <MudTd DataLabel="Components Correct">@rowContext.components_correct</MudTd>
+            <MudTd DataLabel="Cable Correct">@rowContext.cable_correct</MudTd>
+            <MudTd DataLabel="Wiring Correct">@rowContext.wiring_correct</MudTd>
+            <MudTd DataLabel="Wire Sleeves">@rowContext.wire_sleeves</MudTd>
+            <MudTd DataLabel="Wire Damage">@rowContext.wire_damage</MudTd>
+            <MudTd DataLabel="Wiring Following Drawing">@rowContext.wiring_following_drawing</MudTd>
+            <MudTd DataLabel="Wire Color Code">@rowContext.wire_color_code</MudTd>
+            <MudTd DataLabel="No Direct Contact">@rowContext.no_direct_contact</MudTd>
+            <MudTd DataLabel="Correct Wiring">@rowContext.correct_wiring</MudTd>
+            <MudTd DataLabel="Indicator Component">@rowContext.indicator_component</MudTd>
+            <MudTd DataLabel="EMO Function">@rowContext.emo_function</MudTd>
+            <MudTd DataLabel="Pump Wiring">@rowContext.pump_wiring</MudTd>
+            <MudTd DataLabel="No Active Conductor">@rowContext.no_active_conductor</MudTd>
+            <MudTd DataLabel="Circuit Correct">@rowContext.circuit_correct</MudTd>
+            <MudTd DataLabel="Documentation Complete">@rowContext.documentation_complete</MudTd>
+            <MudTd DataLabel="Connection From Terminal">@rowContext.connection_from_terminal</MudTd>
+            <MudTd DataLabel="Isolator to ELCB">@rowContext.isolator_to_elcb</MudTd>
+            <MudTd DataLabel="Out ELCB to MCB">@rowContext.outelcb_to_mcb</MudTd>
+            <MudTd DataLabel="Connection MCB Transformer">@rowContext.connection_mcb_transformer</MudTd>
+            <MudTd DataLabel="Connection Transformer MCB">@rowContext.connection_transformer_mcb</MudTd>
+            <MudTd DataLabel="MCB to DC Power">@rowContext.mcb_to_dc_power</MudTd>
+            <MudTd DataLabel="ELCB to IN MCB">@rowContext.elcb_to_inmcb</MudTd>
+            <MudTd DataLabel="MCB to Contactor">@rowContext.mcb_to_contactor</MudTd>
+            <MudTd DataLabel="MC to TOR">@rowContext.mc_to_tor</MudTd>
+            <MudTd DataLabel="TOR to Motor">@rowContext.tor_to_motor</MudTd>
+            <MudTd DataLabel="Grounding Terminal">@rowContext.grounding_terminal</MudTd>
+            <MudTd DataLabel="Level Sensor">@rowContext.level_sensor</MudTd>
+            <MudTd DataLabel="Voltage Phase 1 Neutral">@rowContext.voltage_phase1_neutral</MudTd>
+            <MudTd DataLabel="Multi Read Phase 1 (V)">@rowContext.multi_read_phase1</MudTd>
+            <MudTd DataLabel="Voltage Phase 2 Neutral">@rowContext.voltage_phase2_neutral</MudTd>
+            <MudTd DataLabel="Multi Read Phase 2 (V)">@rowContext.multi_read_phase2</MudTd>
+            <MudTd DataLabel="Voltage Phase 3 Neutral">@rowContext.voltage_phase3_neutral</MudTd>
+            <MudTd DataLabel="Multi Read Phase 3 (V)">@rowContext.multi_read_phase3</MudTd>
+            </RowTemplate>
+    </MudTable>
+</AuthorizeView>
+
+
+@code {
+    private List<DataFetch> dataFetches = new();
+    private string searchTerm = "";
+
+    string[] headings = { "ID", "Model Number", "Machine Serial Number", "Motor Serial Number", "Pump Serial Number","Name", "Phone Number", "Email", "Verified By",
+    "AC Terminal Block", "MCB Correct", "Power Isolator Switch", "ELCB Spec", "Stepdown Transformer", "DC Power Supply", "Thermal Motor Spec", "Thermal Correct", "Emergency Stop Button","Motor Pump Wiring","Indicator Lamp","Float Sensor","Push Button","Compononets Correct",
+    "Cable Correct","Wiring Correct","Wire Sleeves","Wire Damage","Strain Relief","Wiring Following Drawing","Wire Color Code","No Direct Contact",
+    "Correct Wiring","Indicator Component","Emo Function","Pump Wiring","No Active Conductor","Circuit Correct","Documentation Complete",
+    "COnnection From Terminal","Isolator to ELCB","Out ELCB to MCB","Connection MCB Transformer","Connection Transformer MCB","MCB to DC Power",
+    "ELCB to In MCB","MCB to Contactor","MC to TOR","TOR to Motor","Grounding Terminal","Level Sensor","Voltage Phase 1 Natural","Multi Read Phase 1", "Voltage Phase 2 Natural", "Multi Read Phase 2","Voltage Phase 3 Natural","Multi Read Phase 3" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        string cmd = $"SELECT id, model_num, machine_serial_num, motor_serial_num, pump_serial_num, name, phone_number, email, verified, " +
+            "ac_terminal_block, mcb_correct, power_isolator_switch, elcb_spec, stepdown_transformer, dc_power_supply, thermal_motor_spec, " +
+             "thermal_correct, emergency_stop_button, motor_pump_wiring, indicator_lamp, float_sensor, push_button, components_correct, " +
+             "cable_correct, wiring_correct, wire_sleeves, wire_damage, strain_relief, wiring_following_drawing, wire_color_code, " +
+             "no_direct_contact, correct_wiring, indicator_component, emo_function, pump_wiring, no_active_conductor, circuit_correct, " +
+             "documentation_complete, connection_from_terminal, isolator_to_elcb, outelcb_to_mcb, connection_mcb_transformer, " +
+             "connection_transformer_mcb, mcb_to_dc_power, elcb_to_inmcb, mcb_to_contactor, mc_to_tor, tor_to_motor, grounding_terminal, " +
+             "level_sensor, voltage_phase1_neutral, multi_read_phase1, voltage_phase2_neutral, multi_read_phase2, voltage_phase3_neutral multi_read_phase3 FROM checklist_responses;";
+
+        dataFetches = await dbhelper.Fetch<DataFetch>(cmd);
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        string cmd = "SELECT * FROM checklist_responses";
+        dataFetches = await dbhelper.Fetch<DataFetch>(cmd);
+
+    }
+
+    private async Task Search()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            await FetchData();
+            return;
+        }
+
+        dataFetches = (from row in dataFetches
+                       where RowContainsSearchTerm(row)
+                       select row).ToList();
+    }
+
+    private bool RowContainsSearchTerm(DataFetch row)
+    {
+        var properties = row.GetType().GetProperties();
+        foreach (var prop in properties)
+        {
+            var value = prop.GetValue(row)?.ToString();
+            if (value != null && value.ToLower().Contains(searchTerm.ToLower()))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private async Task DownloadTable()
+    {
+        string projectName = "Washing Cleaning Sink";
+        string csvContent = ConvertToCSV(dataFetches, projectName); // Use FilteredDataFetch instead of dataFetch
+        await jsRuntime.InvokeVoidAsync("downloadFile", "Electrical Testing & Commissioning Checklist.csv", csvContent);
+    }
+
+    private string ConvertToCSV(IEnumerable<DataFetch> data, string projectName)
+    {
+        // Create a StringBuilder to store CSV content
+        var csv = new StringBuilder();
+
+        // Append header row
+        csv.AppendLine($"Project Name: {projectName}");
+        csv.AppendLine("Id,Model Number,Machine Serial Num, Motor Serial Num, Pump Serial Num, Name,Phone Number,Email,Verified by,AC Terminal Block,MCB Correct,Power Isolator Switch,ELCB Spec,Stepdown Transformer,DC Power Supply,Thermal Motor Spec,Thermal Correct,Emergency Stop Button,Motor Pump Wiring,Indicator Lamp,Float Sensor,Push Button,Components Correct,Cable Correct,Wiring Correct,Wire Sleeves,Wire Damage,Strain Relief,Wiring Following Drawing,Wire Color Code,No Direct Contact,Correct Wiring,Indicator Component,EMO Function,Pump Wiring,No Active Conductor,Circuit Correct,Documentation Complete,Connection from Terminal,Isolator to ELCB,Out ELCB to MCB,Connection MCB Transformer,Connection Transformer MCB,MCB to DC Power,ELCB to IN MCB,MCB to Contactor,MC to TOR,TOR to Motor,Grounding Terminal,Level Sensor,Voltage Phase1 Neutral, Multi Read Phase1 (V), Voltage Phase2 Neutral,Multi Read Phase2 (V), Voltage Phase3 Neutral, Multi Read Phase3 (V)");
+
+        // Append data rows
+        foreach (var item in data)
+        {
+            csv.AppendLine($"{item.id},{item.model_num},{item.machine_serial_num},{item.motor_serial_num},{item.pump_serial_num},{item.name},{item.phone_number},{item.email},{item.verified},{item.ac_terminal_block},{item.mcb_correct},{item.power_isolator_switch},{item.elcb_spec},{item.stepdown_transformer},{item.dc_power_supply},{item.thermal_motor_spec},{item.thermal_correct},{item.emergency_stop_button},{item.motor_pump_wiring},{item.indicator_lamp},{item.float_sensor},{item.push_button},{item.components_correct},{item.cable_correct},{item.wiring_correct},{item.wire_sleeves},{item.wire_damage},{item.strain_relief},{item.wiring_following_drawing},{item.wire_color_code},{item.no_direct_contact},{item.correct_wiring},{item.indicator_component},{item.emo_function},{item.pump_wiring},{item.no_active_conductor},{item.circuit_correct},{item.documentation_complete},{item.connection_from_terminal},{item.isolator_to_elcb},{item.outelcb_to_mcb},{item.connection_mcb_transformer},{item.connection_transformer_mcb},{item.mcb_to_dc_power},{item.elcb_to_inmcb},{item.mcb_to_contactor},{item.mc_to_tor},{item.tor_to_motor},{item.grounding_terminal},{item.level_sensor},{item.voltage_phase1_neutral},{item.multi_read_phase1},{item.voltage_phase2_neutral},{item.multi_read_phase2},{item.voltage_phase3_neutral},{item.multi_read_phase3}");
+        }
+        return csv.ToString();
+    }
+   
+}
+
+
